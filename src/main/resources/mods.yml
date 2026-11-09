@@ -13,32 +13,11 @@ Asteroid:
     - "key.asteroid.open-commands"
     - "key.category.asteroid.asteroid"
 
-Wurst:
-  blacklisted: true
-  uncertain-keys:
-    - "key.wurst.zoom"
-    - "description.wurst.hack.killaura"
-
-LiquidBounce:
-  blacklisted: true
-  uncertain-keys:
-    - "liquidbounce.module.killAura.description"
-
 ThunderHack:
   blacklisted: true
   keys:
     - "descriptions.client.thundergui"
     - "descriptions.client.clickgui"
-
-Aristois:
-  blacklisted: true
-  uncertain-keys:
-    - "aristois.key.gui"
-
-Baritone:
-  blacklisted: true
-  uncertain-keys:
-    - "baritone.key.toggle"
 
 Freecam:
   blacklisted: true
@@ -90,8 +69,6 @@ Inventory Move:
     - "key.category.invmove.main"
     - "config.invmove.title"
     - "key.invmove.category.movement"
-  uncertain-keys:
-    - "key.invmove.toggleMove"
 
 Amecs:
   blacklisted: true
@@ -136,8 +113,6 @@ Auto Clicker:
     - "key.category.autoclicker.keybinding-title"
     - "key.category.auto_clicker.auto_clicker"
     - "category.autoclicker-fabric"
-  uncertain-keys:
-    - "key.autoclicker.toggle"
 
 SyncAC:
   blacklisted: true
@@ -205,11 +180,6 @@ TargetESP:
   keys:
     - "key.targetespmod.open"
     - "key.category.targetespmod.controls"
-
-Multi-Keybinds:
-  blacklisted: true
-  uncertain-keys:
-    - "key.categories.amecs"
 
 Xaero's Minimap:
   color: "&#55FFFF"

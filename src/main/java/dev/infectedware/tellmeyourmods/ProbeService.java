@@ -59,6 +59,7 @@ public final class ProbeService implements Listener, PacketListener {
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
     private final Set<UUID> resourcePackLoading = ConcurrentHashMap.newKeySet();
     private final Set<UUID> resourcePackLoaded = ConcurrentHashMap.newKeySet();
+    private final Map<UUID, Result> results = new ConcurrentHashMap<>();
     private final Set<Integer> passedProtocols = ConcurrentHashMap.newKeySet();
     private final Set<Integer> disabledProtocols = ConcurrentHashMap.newKeySet();
     private final Map<Integer, Set<UUID>> failedPlayers = new ConcurrentHashMap<>();
@@ -250,13 +251,22 @@ public final class ProbeService implements Listener, PacketListener {
     private void finish(Session session) {
         end(session);
         Settings settings = plugin.settings();
-        List<Detection> detections = evaluate(session.responses);
-        boolean packLoaded = resourcePackLoaded.contains(session.player.getUniqueId());
-        Component mods = detections.isEmpty()
-                ? Text.color(settings.message("no-mods"))
-                : formatMods(settings, detections, packLoaded);
+        Result result = new Result(evaluate(session.responses), resourcePackLoaded.contains(session.player.getUniqueId()));
+        results.put(session.player.getUniqueId(), result);
+        Component mods = modsComponent(settings, result);
         Component message = Text.color(settings.message("notify").replace("%player%", session.player.getName()));
         broadcast(session, Text.replace(message, "%mods%", mods));
+    }
+
+    public Component lastMods(UUID playerId) {
+        Result result = results.get(playerId);
+        return result == null ? null : modsComponent(plugin.settings(), result);
+    }
+
+    private static Component modsComponent(Settings settings, Result result) {
+        return result.detections().isEmpty()
+                ? Text.color(settings.message("no-mods"))
+                : formatMods(settings, result.detections(), result.packLoaded());
     }
 
     private static Component formatMods(Settings settings, List<Detection> detections, boolean packLoaded) {
@@ -354,6 +364,7 @@ public final class ProbeService implements Listener, PacketListener {
         }
         resourcePackLoading.remove(id);
         resourcePackLoaded.remove(id);
+        results.remove(id);
     }
 
     @EventHandler
@@ -378,10 +389,14 @@ public final class ProbeService implements Listener, PacketListener {
         sessions.clear();
         resourcePackLoading.clear();
         resourcePackLoaded.clear();
+        results.clear();
     }
 
     private record Probe(Location location, Vector3i position, List<String> keys, List<String> sentinels,
                          BlockData realBlock) {
+    }
+
+    private record Result(List<Detection> detections, boolean packLoaded) {
     }
 
     private static final class Session {

@@ -1,18 +1,3 @@
-# TellMeYourMods mod database.
-#
-# <Mod display name>:
-#   color: "&#RRGGBB"      optional, ignored when blacklisted (colors.blacklisted wins)
-#   blacklisted: true      optional, default false
-#   min-matches: 1         optional, overrides detection.min-matches
-#   keys:                  translation keys owned by the mod
-#     - "some.translation.key"
-#     - "some.other.key=Expected value"   optional expected value after the first "="
-#
-# A key only counts when the client sends back text that is not the probe sentinel,
-# not the raw key and, when set, equal to the expected value.
-# Keys marked "uncertain" were not verified against the mod's language files.
-# Do not use dots in display names.
-
 Meteor Client:
   color: "&#9B59FF"
   blacklisted: true
@@ -24,19 +9,17 @@ Wurst:
   blacklisted: true
   keys:
     - "key.wurst.zoom"
-    # uncertain
+  uncertain-keys:
     - "description.wurst.hack.killaura"
 
 LiquidBounce:
   blacklisted: true
-  keys:
-    # uncertain
+  uncertain-keys:
     - "liquidbounce.module.killAura.description"
 
 Aristois:
   blacklisted: true
-  keys:
-    # uncertain
+  uncertain-keys:
     - "aristois.key.gui"
 
 Freecam:
@@ -48,52 +31,43 @@ Freecam:
 
 Baritone:
   blacklisted: true
-  keys:
-    # uncertain, Baritone mostly uses hardcoded strings
+  uncertain-keys:
     - "baritone.key.toggle"
 
 Tweakeroo:
-  # Provides accurate placement, fast place, freecam and hotbar tweaks
   blacklisted: true
-  keys:
-    # uncertain
+  uncertain-keys:
     - "tweakeroo.gui.title.configs"
 
 Accurate Block Placement:
   blacklisted: true
-  keys:
-    # uncertain
+  uncertain-keys:
     - "key.accurateblockplacement.togglevanillaplacement"
 
 Inventory Move:
   blacklisted: true
-  keys:
-    # uncertain
+  uncertain-keys:
     - "key.invmove.toggleMove"
 
 Multi-Keybinds:
   blacklisted: true
-  keys:
-    # uncertain
+  uncertain-keys:
     - "key.categories.amecs"
 
 Auto Totem:
   blacklisted: true
-  keys:
-    # uncertain
+  uncertain-keys:
     - "key.autototem.toggle"
 
 Auto Clicker:
   blacklisted: true
-  keys:
-    # uncertain
+  uncertain-keys:
     - "key.autoclicker.toggle"
 
 Xaero's Minimap:
   color: "&#55FFFF"
   blacklisted: false
-  keys:
-    # uncertain
+  uncertain-keys:
     - "gui.xaero_minimap_settings"
 
 Mod Menu:
@@ -108,12 +82,10 @@ Iris:
 
 Sodium:
   blacklisted: false
-  keys:
-    # uncertain
+  uncertain-keys:
     - "sodium.option_impact.low"
 
 Litematica:
   blacklisted: false
-  keys:
-    # uncertain
+  uncertain-keys:
     - "litematica.gui.title.configs"

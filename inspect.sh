@@ -106,6 +106,9 @@ done < <(grep -rhoE '"tellmeyourmods\.[a-z0-9_.-]*[a-z0-9_-]"' "$java_sources" |
 
 echo "==> Checking sources"
 while IFS= read -r line; do
+    error "comment: $line"
+done < <(grep -rnE '^\s*(//|/\*|\*|#)' src build.gradle.kts settings.gradle.kts gradle.properties)
+while IFS= read -r line; do
     warning "unfinished: $line"
 done < <(grep -rnE 'TODO|FIXME|XXX' src)
 while IFS= read -r line; do

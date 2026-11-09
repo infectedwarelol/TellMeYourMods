@@ -3,8 +3,7 @@ plugins {
 }
 
 group = "dev.infectedware"
-// Single source of truth for the plugin version, filtered into plugin.yml.
-version = "0.4.0"
+version = "0.5.0"
 
 repositories {
     mavenCentral()
@@ -13,7 +12,6 @@ repositories {
 }
 
 dependencies {
-    // Built against the lowest supported API so 1.20.1+ servers can load it.
     compileOnly("io.papermc.paper:paper-api:1.20.1-R0.1-SNAPSHOT")
     compileOnly("com.github.retrooper:packetevents-spigot:2.14.0")
 }

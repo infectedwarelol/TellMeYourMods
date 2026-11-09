@@ -1,38 +1,20 @@
-# TellMeYourMods
-# Every message supports legacy & codes and &#RRGGBB hex colors.
-# Results only say a mod is "possible" or "indicated". Nothing is punished.
-
 detection:
-  # Probe players automatically after they join.
   check-on-join: true
-  # Ticks to wait after join before the first probe.
   join-delay-ticks: 100
-  # Ticks between two sign probes (each probe asks 4 keys).
   probe-delay-ticks: 10
-  # Ticks to wait for a sign reply before giving up on the player.
   timeout-ticks: 60
-  # Ticks to wait before retrying while a server resource pack is loading.
   resource-pack-retry-ticks: 40
-  # Default number of matching keys needed before a mod is reported.
-  # A mod can override it with min-matches in mods.yml.
   min-matches: 1
 
 patch-check:
-  # Ask a vanilla key first. If a client does not resolve it, the technique is
-  # likely patched or blocked for that client and its result is not trusted.
   enabled: true
-  # Disable detection for a client protocol after this many different players
-  # failed the vanilla check and no player on that protocol passed it.
   failures-to-disable: 3
 
 colors:
-  # Always used for blacklisted mods, overrides any per-mod color.
   blacklisted: "&#FF5555"
-  # Used for allowed mods without their own color.
   allowed: "&#55FF55"
 
 messages:
-  # %player% = player name, %mods% = colored mod list.
   notify: "&8[&bTMYM&8] &e%player%&7's mods: %mods%"
   separator: "&7, "
   no-mods: "&7none indicated"

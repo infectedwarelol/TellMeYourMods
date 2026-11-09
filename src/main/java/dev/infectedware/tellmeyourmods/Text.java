@@ -5,7 +5,6 @@ import net.kyori.adventure.text.TextReplacementConfig;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 
-// Shared conversion of config strings (& codes and &#RRGGBB hex) to Adventure components.
 public final class Text {
 
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.builder()
@@ -21,7 +20,6 @@ public final class Text {
         return input == null || input.isEmpty() ? Component.empty() : LEGACY.deserialize(input);
     }
 
-    // Strips every color so the console log stays plain text.
     public static String plain(Component component) {
         return PlainTextComponentSerializer.plainText().serialize(component);
     }

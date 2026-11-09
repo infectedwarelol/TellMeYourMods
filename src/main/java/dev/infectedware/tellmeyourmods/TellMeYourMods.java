@@ -39,7 +39,6 @@ public final class TellMeYourMods extends JavaPlugin {
         }
     }
 
-    // Safe to call off the main thread: only reads files and swaps a volatile snapshot.
     public void reload() {
         reloadConfig();
         settings = Settings.load(getConfig());

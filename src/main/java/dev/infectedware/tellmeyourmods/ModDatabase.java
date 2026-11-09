@@ -12,12 +12,10 @@ import java.util.logging.Logger;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-// Immutable view of mods.yml, swapped as a whole on reload.
 public record ModDatabase(List<Mod> mods, List<String> keys) {
 
     public record Mod(String name, String color, boolean blacklisted, int minMatches, Map<String, String> keys) {
 
-        // Expected value for a key, or null when any resolved text counts.
         public String expected(String key) {
             return keys.get(key);
         }
@@ -34,8 +32,9 @@ public record ModDatabase(List<Mod> mods, List<String> keys) {
                 continue;
             }
             Map<String, String> keys = new HashMap<>();
-            for (String entry : section.getStringList("keys")) {
-                // "key=expected" carries an expected value, translation keys never contain "=".
+            List<String> entries = new ArrayList<>(section.getStringList("keys"));
+            entries.addAll(section.getStringList("uncertain-keys"));
+            for (String entry : entries) {
                 int split = entry.indexOf('=');
                 String key = (split < 0 ? entry : entry.substring(0, split)).trim();
                 if (key.isEmpty()) {

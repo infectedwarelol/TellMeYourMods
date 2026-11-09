@@ -38,21 +38,25 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 
-// Runs sign translation-key probes. Per-player work runs on the player's EntityScheduler,
-// which is the region thread on Folia and the main thread on Paper.
 public final class ProbeService implements Listener, PacketListener {
 
     public static final String BYPASS_PERMISSION = "tellmeyourmods.bypass";
     private static final int LINES_PER_SIGN = 4;
-    // Offsets from the player's feet tried for the fake sign, closest first.
+    private static final String CANARY_KEY = "language.code";
     private static final int[] PROBE_Y_OFFSETS = {-2, 3, -3, 4};
 
-    public enum StartResult { STARTED, BYPASSED, ALREADY_RUNNING, NOTHING_TO_PROBE }
+    public enum StartResult { STARTED, BYPASSED, ALREADY_RUNNING, NOTHING_TO_PROBE, DISABLED }
+
+    public record Detection(ModDatabase.Mod mod, int matches) {
+    }
 
     private final TellMeYourMods plugin;
     private final Map<UUID, Session> sessions = new ConcurrentHashMap<>();
     private final Set<UUID> resourcePackLoading = ConcurrentHashMap.newKeySet();
     private final Set<UUID> resourcePackLoaded = ConcurrentHashMap.newKeySet();
+    private final Set<Integer> passedProtocols = ConcurrentHashMap.newKeySet();
+    private final Set<Integer> disabledProtocols = ConcurrentHashMap.newKeySet();
+    private final Map<Integer, Set<UUID>> failedPlayers = new ConcurrentHashMap<>();
 
     public ProbeService(TellMeYourMods plugin) {
         this.plugin = plugin;
@@ -66,7 +70,18 @@ public final class ProbeService implements Listener, PacketListener {
         if (keys.isEmpty()) {
             return StartResult.NOTHING_TO_PROBE;
         }
-        Session session = new Session(player, requester, partition(keys));
+        Settings settings = plugin.settings();
+        int protocol = PacketEvents.getAPI().getPlayerManager().getClientVersion(player).getProtocolVersion();
+        if (settings.patchCheck() && disabledProtocols.contains(protocol)) {
+            return StartResult.DISABLED;
+        }
+        if (settings.patchCheck()) {
+            List<String> withCanary = new ArrayList<>(keys.size() + 1);
+            withCanary.add(CANARY_KEY);
+            withCanary.addAll(keys);
+            keys = withCanary;
+        }
+        Session session = new Session(player, requester, protocol, partition(keys));
         if (sessions.putIfAbsent(player.getUniqueId(), session) != null) {
             return StartResult.ALREADY_RUNNING;
         }
@@ -82,7 +97,6 @@ public final class ProbeService implements Listener, PacketListener {
         return batches;
     }
 
-    // Region thread: sends the next sign, or reports when every batch is answered.
     private void sendNext(Session session) {
         Player player = session.player;
         if (!player.isOnline() || sessions.get(player.getUniqueId()) != session) {
@@ -90,7 +104,6 @@ public final class ProbeService implements Listener, PacketListener {
             return;
         }
         Settings settings = plugin.settings();
-        // Resource packs can define translation keys, so wait until loading finished.
         if (resourcePackLoading.contains(player.getUniqueId())) {
             schedule(session, settings.resourcePackRetryTicks());
             return;
@@ -112,7 +125,6 @@ public final class ProbeService implements Listener, PacketListener {
         SignSide front = sign.getSide(Side.FRONT);
         for (int line = 0; line < batch.size(); line++) {
             String key = batch.get(line);
-            // Unique fallback per probe line, returned untouched when the client lacks the key.
             String sentinel = "tmym" + Long.toHexString(ThreadLocalRandom.current().nextLong());
             sentinels.add(sentinel);
             front.line(line, Component.translatable().key(key).fallback(sentinel).build());
@@ -124,7 +136,6 @@ public final class ProbeService implements Listener, PacketListener {
         player.sendBlockChange(location, signData);
         player.sendBlockUpdate(location, sign);
         PacketEvents.getAPI().getPlayerManager().sendPacket(player, new WrapperPlayServerOpenSignEditor(probe.position, true));
-        // Removing the sign right away makes the client close the editor and send the resolved text.
         player.sendBlockChange(location, probe.realBlock);
 
         session.timeoutTask = player.getScheduler().runDelayed(plugin, task -> onTimeout(session, probe),
@@ -135,7 +146,6 @@ public final class ProbeService implements Listener, PacketListener {
         session.player.getScheduler().runDelayed(plugin, task -> sendNext(session), () -> end(session), delayTicks);
     }
 
-    // Picks a block near the player that is not a tile entity, so restoring it needs only a block change.
     private static Location probeLocation(Player player) {
         Location feet = player.getLocation();
         World world = feet.getWorld();
@@ -152,7 +162,6 @@ public final class ProbeService implements Listener, PacketListener {
         return null;
     }
 
-    // Netty thread: claims our own sign replies and hands them to the player's region thread.
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
         if (event.getPacketType() != PacketType.Play.Client.UPDATE_SIGN || event.getUser() == null) {
@@ -183,10 +192,47 @@ public final class ProbeService implements Listener, PacketListener {
         cancelTimeout(session);
         restore(session.player, probe);
         for (int index = 0; index < probe.keys.size(); index++) {
+            String key = probe.keys.get(index);
             String response = index < responses.length ? responses[index] : null;
-            session.responses.put(probe.keys.get(index), response == null ? "" : response);
+            boolean resolved = isResolved(response, key, probe.sentinels.get(index));
+            if (key.equals(CANARY_KEY)) {
+                if (!resolved) {
+                    onCanaryFailed(session);
+                    return;
+                }
+                passedProtocols.add(session.protocol);
+                continue;
+            }
+            if (resolved) {
+                session.responses.put(key, response);
+            }
         }
         schedule(session, plugin.settings().probeDelayTicks());
+    }
+
+    private static boolean isResolved(String response, String key, String sentinel) {
+        if (response == null) {
+            return false;
+        }
+        String text = response.strip();
+        return !text.isEmpty() && !text.equals(sentinel) && !text.equals(key);
+    }
+
+    private void onCanaryFailed(Session session) {
+        end(session);
+        Settings settings = plugin.settings();
+        Set<UUID> failed = failedPlayers.computeIfAbsent(session.protocol, protocol -> ConcurrentHashMap.newKeySet());
+        failed.add(session.player.getUniqueId());
+        if (!passedProtocols.contains(session.protocol) && failed.size() >= settings.failuresToDisable()
+                && disabledProtocols.add(session.protocol)) {
+            plugin.getLogger().warning("Clients on protocol " + session.protocol + " do not resolve translation keys on signs."
+                    + " The technique looks patched for that version, detection is disabled for it.");
+        }
+        String message = settings.message("unresolved").replace("%player%", session.player.getName());
+        plugin.getLogger().info(Text.plain(Text.color(message)));
+        if (session.requester != null) {
+            session.requester.sendMessage(Text.color(message));
+        }
     }
 
     private void onTimeout(Session session, Probe probe) {
@@ -204,7 +250,35 @@ public final class ProbeService implements Listener, PacketListener {
 
     private void finish(Session session) {
         end(session);
-        plugin.getLogger().info(session.player.getName() + " answered " + session.responses.size() + " probe keys.");
+        List<Detection> detections = evaluate(session.responses);
+        List<String> names = new ArrayList<>(detections.size());
+        for (Detection detection : detections) {
+            names.add(detection.mod().name());
+        }
+        plugin.getLogger().info(session.player.getName() + "'s possible mods: " + (names.isEmpty() ? "none indicated" : String.join(", ", names)));
+    }
+
+    private List<Detection> evaluate(Map<String, String> responses) {
+        List<Detection> detections = new ArrayList<>();
+        if (responses.isEmpty()) {
+            return detections;
+        }
+        int defaultMinMatches = plugin.settings().minMatches();
+        for (ModDatabase.Mod mod : plugin.mods().mods()) {
+            int matches = 0;
+            for (String key : mod.keys().keySet()) {
+                String response = responses.get(key);
+                String expected = mod.expected(key);
+                if (response != null && (expected == null || expected.equals(response.strip()))) {
+                    matches++;
+                }
+            }
+            int required = mod.minMatches() > 0 ? mod.minMatches() : defaultMinMatches;
+            if (matches >= required) {
+                detections.add(new Detection(mod, matches));
+            }
+        }
+        return detections;
     }
 
     private static void restore(Player player, Probe probe) {
@@ -249,7 +323,6 @@ public final class ProbeService implements Listener, PacketListener {
     @EventHandler
     public void onResourcePackStatus(PlayerResourcePackStatusEvent event) {
         UUID id = event.getPlayer().getUniqueId();
-        // DOWNLOADED only exists on 1.20.3+, so compare by name to stay loadable on 1.20.1.
         String status = event.getStatus().name();
         if (status.equals("ACCEPTED") || status.equals("DOWNLOADED")) {
             resourcePackLoading.add(id);
@@ -262,6 +335,7 @@ public final class ProbeService implements Listener, PacketListener {
     }
 
     public void shutdown() {
+        failedPlayers.clear();
         for (Session session : sessions.values()) {
             cancelTimeout(session);
         }
@@ -278,16 +352,16 @@ public final class ProbeService implements Listener, PacketListener {
 
         private final Player player;
         private final CommandSender requester;
-        // Touched only on the player's region thread.
+        private final int protocol;
         private final Deque<List<String>> batches;
         private final Map<String, String> responses = new HashMap<>();
-        // Shared with the netty thread; whoever clears it owns the reply or the timeout.
         private final AtomicReference<Probe> pending = new AtomicReference<>();
         private volatile ScheduledTask timeoutTask;
 
-        private Session(Player player, CommandSender requester, Deque<List<String>> batches) {
+        private Session(Player player, CommandSender requester, int protocol, Deque<List<String>> batches) {
             this.player = player;
             this.requester = requester;
+            this.protocol = protocol;
             this.batches = batches;
         }
     }

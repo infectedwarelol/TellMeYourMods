@@ -2,7 +2,6 @@ package dev.infectedware.tellmeyourmods;
 
 import org.bukkit.configuration.file.FileConfiguration;
 
-// Immutable snapshot of config.yml, swapped as a whole on reload.
 public record Settings(
         boolean checkOnJoin,
         long joinDelayTicks,
@@ -33,12 +32,10 @@ public record Settings(
         );
     }
 
-    // Raw message string, empty when missing so callers never see null.
     public String message(String key) {
         return messages.getString("messages." + key, "");
     }
 
-    // Schedulers reject delays below one tick.
     private static long ticks(FileConfiguration config, String path, long fallback) {
         return Math.max(1L, config.getLong(path, fallback));
     }

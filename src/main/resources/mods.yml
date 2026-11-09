@@ -46,15 +46,17 @@ Freecam:
     - "key.freecam.toggle"
     - "key.freecam.config.open"
     - "key.category.freecam.controls"
-  uncertain-keys:
     - "key.freecam.playerControl"
     - "key.freecam.tripodReset"
+    - "key.freecam.configGui"
+    - "category.freecam.freecam"
 
 Tweakeroo:
   blacklisted: true
   keys:
     - "tweakeroo.config.feature_toggle.name.tweakFastBlockPlacement"
     - "tweakeroo.config.feature_toggle.name.tweakFreeCamera"
+    - "tweakeroo.hotkeys.category.tweak_toggle_hotkeys"
 
 Accurate Block Placement:
   blacklisted: true
@@ -68,6 +70,7 @@ Pro Placer:
   keys:
     - "key.proplacer.fast_placement"
     - "key.category.proplacer.main"
+    - "key.categories.proplacer"
 
 FastPlace Plus:
   blacklisted: true
@@ -86,6 +89,7 @@ Inventory Move:
   keys:
     - "key.category.invmove.main"
     - "config.invmove.title"
+    - "key.invmove.category.movement"
   uncertain-keys:
     - "key.invmove.toggleMove"
 
@@ -100,6 +104,7 @@ Command Keys:
   keys:
     - "key.category.commandkeys.main"
     - "key.commandkeys.main.edit"
+    - "key.commandkeys.main"
 
 Command Macros:
   blacklisted: true
@@ -130,6 +135,7 @@ Auto Clicker:
   keys:
     - "key.category.autoclicker.keybinding-title"
     - "key.category.auto_clicker.auto_clicker"
+    - "category.autoclicker-fabric"
   uncertain-keys:
     - "key.autoclicker.toggle"
 
@@ -149,6 +155,8 @@ Inventive Inventory:
   keys:
     - "key.category.inventive-inventory.main"
     - "key.inventive-inventory.sort"
+    - "key.category.inventive_inventory.main"
+    - "key.inventive_inventory.sort"
 
 Auto Refill Slot:
   blacklisted: true
@@ -178,6 +186,8 @@ Midnight Assist:
   keys:
     - "key.midnight-assist.toggle"
     - "category.midnight-assist"
+    - "key.midnight-assisit.toggle"
+    - "category.midnight-assisit"
 
 Motor Assistance:
   blacklisted: true
@@ -240,5 +250,4 @@ Litematica:
   blacklisted: false
   keys:
     - "litematica.gui.title.area_selection_manager"
-  uncertain-keys:
     - "litematica.gui.title.configs"

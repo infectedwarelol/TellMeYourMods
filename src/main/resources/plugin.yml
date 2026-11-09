@@ -6,6 +6,11 @@ author: infectedware
 description: idk, get ppl mod
 folia-supported: true
 depend: [packetevents]
+commands:
+  tmym:
+    description: Check a player for possible client mods or reload the plugin.
+    usage: /tmym <check <player>|reload>
+    permission: tellmeyourmods.admin
 permissions:
   tellmeyourmods.admin:
     description: Use /tmym check and /tmym reload.

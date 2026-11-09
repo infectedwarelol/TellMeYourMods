@@ -4,6 +4,7 @@ import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.event.PacketListenerCommon;
 import com.github.retrooper.packetevents.event.PacketListenerPriority;
 import java.io.File;
+import org.bukkit.command.PluginCommand;
 import org.bukkit.event.HandlerList;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,6 +25,12 @@ public final class TellMeYourMods extends JavaPlugin {
         probes = new ProbeService(this);
         getServer().getPluginManager().registerEvents(probes, this);
         packetListener = PacketEvents.getAPI().getEventManager().registerListener(probes, PacketListenerPriority.NORMAL);
+        PluginCommand command = getCommand(TmymCommand.NAME);
+        if (command != null) {
+            TmymCommand executor = new TmymCommand(this, probes);
+            command.setExecutor(executor);
+            command.setTabCompleter(executor);
+        }
     }
 
     @Override

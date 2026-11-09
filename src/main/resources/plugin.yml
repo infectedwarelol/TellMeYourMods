@@ -1,0 +1,8 @@
+name: TellMeYourMods
+version: '${version}'
+main: dev.infectedware.tellmeyourmods.TellMeYourMods
+api-version: '1.20'
+author: infectedware
+description: idk, get ppl mod
+folia-supported: true
+depend: [packetevents]

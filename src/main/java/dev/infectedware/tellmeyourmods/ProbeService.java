@@ -102,6 +102,7 @@ public final class ProbeService implements Listener, PacketListener {
         return batches;
     }
 
+    @SuppressWarnings("UnstableApiUsage")
     private void sendNext(Session session) {
         Player player = session.player;
         if (!player.isOnline() || sessions.get(player.getUniqueId()) != session) {
@@ -169,11 +170,10 @@ public final class ProbeService implements Listener, PacketListener {
 
     @Override
     public void onPacketReceive(PacketReceiveEvent event) {
-        if (event.getPacketType() != PacketType.Play.Client.UPDATE_SIGN || event.getUser() == null) {
+        if (event.getPacketType() != PacketType.Play.Client.UPDATE_SIGN) {
             return;
         }
-        UUID id = event.getUser().getUUID();
-        Session session = id == null ? null : sessions.get(id);
+        Session session = sessions.get(event.getUser().getUUID());
         if (session == null) {
             return;
         }

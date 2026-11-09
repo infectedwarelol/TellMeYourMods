@@ -20,6 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicReference;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.JoinConfiguration;
+import net.kyori.adventure.text.event.HoverEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -30,6 +33,7 @@ import org.bukkit.block.data.BlockData;
 import org.bukkit.block.sign.Side;
 import org.bukkit.block.sign.SignSide;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,6 +45,7 @@ import org.bukkit.event.player.PlayerResourcePackStatusEvent;
 public final class ProbeService implements Listener, PacketListener {
 
     public static final String BYPASS_PERMISSION = "tellmeyourmods.bypass";
+    public static final String NOTIFY_PERMISSION = "tellmeyourmods.notify";
     private static final int LINES_PER_SIGN = 4;
     private static final String CANARY_KEY = "language.code";
     private static final int[] PROBE_Y_OFFSETS = {-2, 3, -3, 4};
@@ -229,10 +234,7 @@ public final class ProbeService implements Listener, PacketListener {
                     + " The technique looks patched for that version, detection is disabled for it.");
         }
         String message = settings.message("unresolved").replace("%player%", session.player.getName());
-        plugin.getLogger().info(Text.plain(Text.color(message)));
-        if (session.requester != null) {
-            session.requester.sendMessage(Text.color(message));
-        }
+        broadcast(session, Text.color(message));
     }
 
     private void onTimeout(Session session, Probe probe) {
@@ -242,20 +244,54 @@ public final class ProbeService implements Listener, PacketListener {
         restore(session.player, probe);
         end(session);
         String message = plugin.settings().message("no-reply").replace("%player%", session.player.getName());
-        plugin.getLogger().info(Text.plain(Text.color(message)));
-        if (session.requester != null) {
-            session.requester.sendMessage(Text.color(message));
-        }
+        broadcast(session, Text.color(message));
     }
 
     private void finish(Session session) {
         end(session);
+        Settings settings = plugin.settings();
         List<Detection> detections = evaluate(session.responses);
-        List<String> names = new ArrayList<>(detections.size());
+        boolean packLoaded = resourcePackLoaded.contains(session.player.getUniqueId());
+        Component mods = detections.isEmpty()
+                ? Text.color(settings.message("no-mods"))
+                : formatMods(settings, detections, packLoaded);
+        Component message = Text.color(settings.message("notify").replace("%player%", session.player.getName()));
+        broadcast(session, Text.replace(message, "%mods%", mods));
+    }
+
+    private static Component formatMods(Settings settings, List<Detection> detections, boolean packLoaded) {
+        List<Component> names = new ArrayList<>(detections.size());
         for (Detection detection : detections) {
-            names.add(detection.mod().name());
+            ModDatabase.Mod mod = detection.mod();
+            String color = mod.blacklisted()
+                    ? settings.colorBlacklisted()
+                    : mod.color() != null ? mod.color() : settings.colorAllowed();
+            Component hover = Text.color(settings.message("hover-possible").replace("%mod%", mod.name()))
+                    .append(Component.newline())
+                    .append(Text.color(settings.message("hover-matches").replace("%count%", Integer.toString(detection.matches()))));
+            if (mod.blacklisted()) {
+                hover = hover.append(Component.newline()).append(Text.color(settings.message("hover-blacklisted")));
+            }
+            if (packLoaded) {
+                hover = hover.append(Component.newline()).append(Text.color(settings.message("hover-resource-pack")));
+            }
+            names.add(Text.color(color + mod.name()).hoverEvent(HoverEvent.showText(hover)));
         }
-        plugin.getLogger().info(session.player.getName() + "'s possible mods: " + (names.isEmpty() ? "none indicated" : String.join(", ", names)));
+        return Component.join(JoinConfiguration.separator(Text.color(settings.message("separator"))), names);
+    }
+
+    private void broadcast(Session session, Component message) {
+        plugin.getLogger().info(Text.plain(message));
+        boolean requesterNotified = false;
+        for (Player online : Bukkit.getOnlinePlayers()) {
+            if (online.hasPermission(NOTIFY_PERMISSION)) {
+                online.sendMessage(message);
+                requesterNotified |= online.equals(session.requester);
+            }
+        }
+        if (session.requester != null && !requesterNotified && !(session.requester instanceof ConsoleCommandSender)) {
+            session.requester.sendMessage(message);
+        }
     }
 
     private List<Detection> evaluate(Map<String, String> responses) {

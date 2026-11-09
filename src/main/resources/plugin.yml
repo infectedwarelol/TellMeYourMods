@@ -6,3 +6,13 @@ author: infectedware
 description: idk, get ppl mod
 folia-supported: true
 depend: [packetevents]
+permissions:
+  tellmeyourmods.admin:
+    description: Use /tmym check and /tmym reload.
+    default: op
+  tellmeyourmods.notify:
+    description: Receive possible mod reports.
+    default: op
+  tellmeyourmods.bypass:
+    description: Never probed for client mods.
+    default: false

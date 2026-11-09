@@ -18,6 +18,8 @@ ThunderHack:
   keys:
     - "descriptions.client.thundergui"
     - "descriptions.client.clickgui"
+    - "descriptions.combat.aura"
+    - "descriptions.combat.aimbot"
 
 Freecam:
   blacklisted: true
@@ -180,6 +182,66 @@ TargetESP:
   keys:
     - "key.targetespmod.open"
     - "key.category.targetespmod.controls"
+
+HamHacks:
+  blacklisted: true
+  keys:
+    - "hamhacks.module.fly"
+    - "hamhacks.module.fly.tooltip"
+
+Gavin's Mod:
+  blacklisted: true
+  keys:
+    - "key.category.minecraft.gavinsmod.keybinds.combat"
+    - "key.category.minecraft.gavinsmod.keybinds.esp"
+
+Shadow Client:
+  blacklisted: true
+  keys:
+    - "key.shadowclient.togglegui"
+    - "category.shadowclient.clientcategory"
+
+Platypus Client:
+  blacklisted: true
+  keys:
+    - "key.category.platypusclient.general"
+    - "key.platypusclient.open_dashboard"
+
+Shade:
+  blacklisted: true
+  keys:
+    - "key.shade.menu"
+    - "key.shade.esp"
+
+Lasse Client:
+  blacklisted: true
+  keys:
+    - "key.category.lasseclient.main"
+    - "key.lasseclient.open_config"
+
+Hachimi Client:
+  blacklisted: true
+  keys:
+    - "accuratepotion-module"
+    - "accuratepotion-module.description"
+
+ReachFly:
+  blacklisted: true
+  keys:
+    - "key.categories.reachfly.category"
+    - "key.reachfly.toggle_reach"
+
+Triggerbot:
+  blacklisted: true
+  keys:
+    - "key.triggerbot.autostun"
+    - "category.triggerbot"
+
+Aim Assist Mod:
+  blacklisted: true
+  keys:
+    - "key.aimassist.menu"
+    - "key.aimassist.toggle"
 
 Xaero's Minimap:
   color: "&#55FFFF"

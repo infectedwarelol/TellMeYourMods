@@ -4,12 +4,19 @@ Meteor Client:
   keys:
     - "key.meteor-client.open-gui"
     - "key.meteor-client.open-commands"
+    - "key.category.meteor-client.meteor-client"
+
+Asteroid:
+  blacklisted: true
+  keys:
+    - "key.asteroid.open-gui"
+    - "key.asteroid.open-commands"
+    - "key.category.asteroid.asteroid"
 
 Wurst:
   blacklisted: true
-  keys:
-    - "key.wurst.zoom"
   uncertain-keys:
+    - "key.wurst.zoom"
     - "description.wurst.hack.killaura"
 
 LiquidBounce:
@@ -17,75 +24,221 @@ LiquidBounce:
   uncertain-keys:
     - "liquidbounce.module.killAura.description"
 
+ThunderHack:
+  blacklisted: true
+  keys:
+    - "descriptions.client.thundergui"
+    - "descriptions.client.clickgui"
+
 Aristois:
   blacklisted: true
   uncertain-keys:
     - "aristois.key.gui"
-
-Freecam:
-  blacklisted: true
-  keys:
-    - "key.freecam.toggle"
-    - "key.freecam.playerControl"
-    - "key.freecam.tripodReset"
 
 Baritone:
   blacklisted: true
   uncertain-keys:
     - "baritone.key.toggle"
 
+Freecam:
+  blacklisted: true
+  keys:
+    - "key.freecam.toggle"
+    - "key.freecam.config.open"
+    - "key.category.freecam.controls"
+  uncertain-keys:
+    - "key.freecam.playerControl"
+    - "key.freecam.tripodReset"
+
 Tweakeroo:
   blacklisted: true
-  uncertain-keys:
-    - "tweakeroo.gui.title.configs"
+  keys:
+    - "tweakeroo.config.feature_toggle.name.tweakFastBlockPlacement"
+    - "tweakeroo.config.feature_toggle.name.tweakFreeCamera"
 
 Accurate Block Placement:
   blacklisted: true
-  uncertain-keys:
+  keys:
     - "key.accurateblockplacement.togglevanillaplacement"
+    - "key.category.accurateblockplacement.category"
+    - "net.clayborn.accurateblockplacement.togglevanillaplacement"
+
+Pro Placer:
+  blacklisted: true
+  keys:
+    - "key.proplacer.fast_placement"
+    - "key.category.proplacer.main"
+
+FastPlace Plus:
+  blacklisted: true
+  keys:
+    - "key.fastplace.cycle_delay"
+    - "key.categories.fastplace.keys"
+
+FastPlace Extras:
+  blacklisted: true
+  keys:
+    - "key.fastplace_extras.toggle_fastplace"
+    - "category.fastplace_extras"
 
 Inventory Move:
   blacklisted: true
+  keys:
+    - "key.category.invmove.main"
+    - "config.invmove.title"
   uncertain-keys:
     - "key.invmove.toggleMove"
+
+Amecs:
+  blacklisted: true
+  keys:
+    - "key.category.amecs.skin_layers"
+    - "key.amecs.toggle_auto_jump"
+
+Command Keys:
+  blacklisted: true
+  keys:
+    - "key.category.commandkeys.main"
+    - "key.commandkeys.main.edit"
+
+Command Macros:
+  blacklisted: true
+  keys:
+    - "key.cmdkeybind.config.title"
+
+QuickBinds:
+  blacklisted: true
+  keys:
+    - "key.quickbinds.open"
+    - "key.category.quickbinds.bindings"
+
+Auto Totem:
+  blacklisted: true
+  keys:
+    - "key.autototem.toggle"
+    - "key.category.autototem.main"
+    - "key.categories.autototem"
+
+Auto Totem Light:
+  blacklisted: true
+  keys:
+    - "key.autototemlight.totem_swap"
+    - "key.smartoffhand.totem_swap"
+
+Auto Clicker:
+  blacklisted: true
+  keys:
+    - "key.category.autoclicker.keybinding-title"
+    - "key.category.auto_clicker.auto_clicker"
+  uncertain-keys:
+    - "key.autoclicker.toggle"
+
+SyncAC:
+  blacklisted: true
+  keys:
+    - "key.syncac.toggle_attack"
+    - "key.category.syncac.main"
+
+AutoSwap:
+  blacklisted: true
+  keys:
+    - "key.category.autoswap.autoswap"
+
+Inventive Inventory:
+  blacklisted: true
+  keys:
+    - "key.category.inventive-inventory.main"
+    - "key.inventive-inventory.sort"
+
+Auto Refill Slot:
+  blacklisted: true
+  keys:
+    - "key.autorefillslot.toggle"
+    - "category.autorefillslot"
+
+Inventory Profiles Next:
+  blacklisted: true
+  keys:
+    - "inventoryprofiles.config.category.auto_refill"
+    - "inventoryprofiles.gui.config.title"
+
+Swap Helper:
+  blacklisted: true
+  keys:
+    - "key.category.swaphelper"
+    - "key.swaphelper.toggle"
+
+MaceBot:
+  blacklisted: true
+  keys:
+    - "key.category.macebot.general"
+
+Midnight Assist:
+  blacklisted: true
+  keys:
+    - "key.midnight-assist.toggle"
+    - "category.midnight-assist"
+
+Motor Assistance:
+  blacklisted: true
+  keys:
+    - "motorassistancemod.configuration.title"
+
+AutoAim:
+  blacklisted: true
+  keys:
+    - "key.autoaim.toggle"
+    - "key.category.autoaim.controls"
+
+TargetESP:
+  blacklisted: true
+  keys:
+    - "key.targetespmod.open"
+    - "key.category.targetespmod.controls"
 
 Multi-Keybinds:
   blacklisted: true
   uncertain-keys:
     - "key.categories.amecs"
 
-Auto Totem:
-  blacklisted: true
-  uncertain-keys:
-    - "key.autototem.toggle"
-
-Auto Clicker:
-  blacklisted: true
-  uncertain-keys:
-    - "key.autoclicker.toggle"
-
 Xaero's Minimap:
   color: "&#55FFFF"
   blacklisted: false
-  uncertain-keys:
+  keys:
     - "gui.xaero_minimap_settings"
+    - "key.category.xaerominimap.controls"
+
+Xaero's Better PvP:
+  color: "&#55FFFF"
+  blacklisted: false
+  keys:
+    - "key.category.xaerobetterpvp.controls"
+
+Item Scroller:
+  blacklisted: false
+  keys:
+    - "itemscroller.gui.title.configs"
 
 Mod Menu:
   blacklisted: false
   keys:
     - "modmenu.title"
+    - "key.modmenu.open_menu"
 
 Iris:
   blacklisted: false
   keys:
     - "options.iris.shaderPackSelection"
+    - "key.category.iris.keybinds"
 
 Sodium:
   blacklisted: false
-  uncertain-keys:
+  keys:
     - "sodium.option_impact.low"
 
 Litematica:
   blacklisted: false
+  keys:
+    - "litematica.gui.title.area_selection_manager"
   uncertain-keys:
     - "litematica.gui.title.configs"
